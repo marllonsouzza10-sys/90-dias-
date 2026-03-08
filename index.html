@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ciclo 90">
+<meta name="theme-color" content="#05050f">
+<title>Ciclo 90 — Marlon Souza</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#05050f;--s1:#0a0a1e;--card:#0f0f28;--card2:#141432;
+  --border:rgba(255,255,255,0.065);--accent:#5b9cf6;--gold:#d4a843;
+  --purple:#a78bfa;--green:#4ade80;--red:#f87171;--amber:#fbbf24;
+  --teal:#2dd4bf;--rose:#fb7185;
+  --text:#ede9df;--muted:#55658a;--dim:#8a9ab5;
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 90% 55% at 5% 0%,rgba(91,156,246,.1) 0%,transparent 55%),
+  radial-gradient(ellipse 60% 80% at 95% 100%,rgba(167,139,250,.08) 0%,transparent 55%),
+  radial-gradient(ellipse 50% 40% at 50% 50%,rgba(212,168,67,.04) 0%,transparent 65%);}
+.app{position:relative;z-index:1;max-width:430px;margin:0 auto;min-height:100dvh}
+.header{padding:calc(var(--safe-t)+16px) 18px 12px;background:rgba(5,5,15,.93);
+  backdrop-filter:blur(32px);-webkit-backdrop-filter:blur(32px);
+  border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.hrow1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.h-eye{font-size:9px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase;margin-bottom:1px}
+.h-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.1;
+  background:linear-gradient(135deg,#ede9df 25%,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.h-badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.hbadge{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;
+  font-size:9.5px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid;white-space:nowrap}
+.hb-notif{background:rgba(91,156,246,.07);border-color:rgba(91,156,246,.18);color:rgba(91,156,246,.8)}
+.hb-notif.on{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);color:rgba(74,222,128,.9)}
+.hb-backup{background:rgba(212,168,67,.07);border-color:rgba(212,168,67,.2);color:rgba(212,168,67,.8)}
+.hb-weekend{background:rgba(45,212,191,.07);border-color:rgba(45,212,191,.2);color:rgba(45,212,191,.8)}
+.hb-weekend.rest{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.3);color:var(--purple)}
+.h-right{text-align:right}
+.h-clock{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--gold)}
+.h-date{font-size:10px;color:var(--muted);margin-top:1px}
+.prog-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:5px}
+.prog-bar{height:3px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--purple));transition:width .6s}
+.streak-banner{margin:10px 16px 0;padding:11px 14px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(212,168,67,.12),rgba(167,139,250,.08));
+  border:1px solid rgba(212,168,67,.2);display:flex;align-items:center;gap:10px}
+.sb-icon{font-size:22px}.sb-text{flex:1}
+.sb-val{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--gold)}
+.sb-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.sb-medal{font-size:22px}
+.nav{display:flex;gap:3px;padding:9px 12px}
+.nav-btn{flex:1;padding:7px 2px;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;color:var(--muted);font-family:'Outfit',sans-serif;
+  font-size:9px;font-weight:500;cursor:pointer;transition:all .2s}
+.nav-btn.active{background:linear-gradient(135deg,rgba(91,156,246,.18),rgba(167,139,250,.18));
+  border-color:rgba(91,156,246,.35);color:var(--text)}
+.view{display:none;padding:10px 15px}
+.view.active{display:block}
+.sdiv{display:flex;align-items:center;gap:8px;margin:15px 0 8px}
+.sdiv span{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.sdiv::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* DASHBOARD */
+.dash-hero{background:linear-gradient(135deg,rgba(91,156,246,.12),rgba(167,139,250,.1));
+border:1px solid rgba(91,156,246,.2);border-radius:18px;padding:18px;margin-bottom:12px}
+.dh-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.dh-greeting{font-size:11px;color:var(–muted);margin-bottom:2px}
+.dh-name{font-family:‘Playfair Display’,serif;font-size:20px;font-weight:900;
+background:linear-gradient(135deg,#ede9df,var(–gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.dh-cycle{font-size:10px;color:var(–muted);margin-top:2px}
+.dh-circle{position:relative;width:64px;height:64px;flex-shrink:0}
+.dh-circle svg{transform:rotate(-90deg)}
+.dh-circle-bg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:5}
+.dh-circle-fill{fill:none;stroke:var(–accent);stroke-width:5;stroke-linecap:round;
+stroke-dasharray:163;transition:stroke-dashoffset .8s}
+.dh-circle-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dh-circle-pct{font-size:13px;font-weight:700;color:var(–gold);line-height:1}
+.dh-circle-sub{font-size:8px;color:var(–muted);margin-top:1px}
+.dh-bars{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dh-bar-item{background:rgba(255,255,255,.04);border-radius:10px;padding:9px 10px}
+.dhb-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.dhb-label{font-size:10px;color:var(–dim);font-weight:500}
+.dhb-val{font-size:10px;font-weight:700;color:var(–text)}
+.dhb-bar{height:4px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.dhb-fill{height:100%;border-radius:99px}
+.dash-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.dash-card{background:var(–card);border:1px solid var(–border);border-radius:16px;padding:14px;position:relative;overflow:hidden}
+.dash-card::before{content:’’;position:absolute;top:0;left:0;right:0;height:2px}
+.dc-hoje::before{background:linear-gradient(90deg,var(–accent),var(–purple))}
+.dc-streak::before{background:linear-gradient(90deg,var(–gold),var(–amber))}
+.dc-fin::before{background:linear-gradient(90deg,var(–green),var(–teal))}
+.dc-medals::before{background:linear-gradient(90deg,var(–purple),var(–rose))}
+.dc-icon{font-size:20px;margin-bottom:6px}
+.dc-val{font-family:‘Playfair Display’,serif;font-size:22px;font-weight:700;line-height:1}
+.dc-lbl{font-size:9.5px;color:var(–muted);margin-top:3px;font-weight:500;letter-spacing:.04em}
+.dc-sub{font-size:9px;color:var(–muted);margin-top:2px}
+.dash-section{background:var(–card);border:1px solid var(–border);border-radius:16px;padding:14px;margin-bottom:10px}
+.ds-title{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(–muted);text-transform:uppercase;margin-bottom:10px}
+.dhl-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;
+background:rgba(255,255,255,.03);border:1px solid var(–border);margin-bottom:5px}
+.dhl-item.done{background:rgba(74,222,128,.05);border-color:rgba(74,222,128,.15)}
+.dhl-item.now{background:rgba(212,168,67,.07);border-color:rgba(212,168,67,.2)}
+.dhl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.1)}
+.dhl-item.done .dhl-dot{background:var(–green)}
+.dhl-item.now .dhl-dot{background:var(–gold);box-shadow:0 0 6px rgba(212,168,67,.5)}
+.dhl-name{flex:1;font-size:12px;font-weight:500}
+.dhl-time{font-size:10px;color:var(–muted)}
+.dhl-check{font-size:12px}
+.fin-totals-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:8px}
+.ftr{text-align:center;padding:10px 6px;border-radius:12px}
+.ftr-rec{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.18)}
+.ftr-desp{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18)}
+.ftr-saldo{background:rgba(91,156,246,.08);border:1px solid rgba(91,156,246,.18)}
+.ftr-val{font-size:14px;font-weight:700;font-family:‘Playfair Display’,serif}
+.ftr-rec .ftr-val{color:var(–green)}
+.ftr-desp .ftr-val{color:var(–red)}
+.ftr-saldo .ftr-val{color:var(–accent)}
+.ftr-lbl{font-size:8.5px;color:var(–muted);margin-top:2px}
+.dm-row{display:flex;gap:7px;flex-wrap:wrap}
+.dm-badge{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.dm-earned{background:linear-gradient(135deg,rgba(212,168,67,.15),rgba(167,139,250,.1));border:1px solid rgba(212,168,67,.3)}
+.dm-locked{background:rgba(255,255,255,.04);border:1px solid var(–border);filter:grayscale(1);opacity:.3}
+.mapa-row{display:flex;gap:3px;flex-wrap:wrap}
+.mapa-dot{width:12px;height:12px;border-radius:3px}
+
+/* ROTINA */
+.ri{display:flex;align-items:stretch;margin-bottom:6px;border-radius:14px;overflow:hidden;border:1px solid var(–border);transition:all .2s;position:relative}
+.ri:active{transform:scale(.986)}
+.ri-stripe{width:3px;flex-shrink:0;background:rgba(255,255,255,.04);transition:background .3s}
+.ri.done .ri-stripe{background:var(–green)}
+.ri.now .ri-stripe{background:var(–gold);box-shadow:0 0 8px rgba(212,168,67,.4)}
+.ri.missed .ri-stripe{background:var(–red)}
+.ri-main{flex:1;background:var(–card);transition:background .2s}
+.ri.done .ri-main{background:rgba(74,222,128,.04)}
+.ri.now .ri-main{background:rgba(212,168,67,.06)}
+.ri.missed .ri-main{background:rgba(248,113,113,.03)}
+.ri-top{display:flex;align-items:center;gap:9px;padding:11px 12px}
+.ri-time-block{flex-shrink:0;text-align:right;min-width:44px}
+.ri-time{font-size:10.5px;color:var(–dim);font-weight:500}
+.ri-dur{font-size:9px;color:var(–muted);margin-top:1px}
+.ri-vline{width:1px;background:var(–border);align-self:stretch;flex-shrink:0}
+.ri-content{flex:1;min-width:0}
+.ri-name{font-size:13px;font-weight:600}
+.ri-sub{font-size:10px;color:var(–muted);margin-top:2px}
+.ri-check{width:27px;height:27px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.05);
+border:1.5px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;
+font-size:13px;transition:all .2s;cursor:pointer}
+.ri.done .ri-check{background:linear-gradient(135deg,#4ade80,#22c55e);border-color:transparent}
+.ri.now .ri-check{border-color:var(–gold);box-shadow:0 0 0 2px rgba(212,168,67,.2)}
+.now-badge{position:absolute;top:6px;right:8px;font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+background:rgba(212,168,67,.18);color:var(–gold);padding:2px 7px;border-radius:99px;
+border:1px solid rgba(212,168,67,.25);font-weight:600}
+.ri-expand{overflow:hidden;max-height:0;transition:max-height .3s cubic-bezier(.23,1,.32,1);
+background:var(–card2);border-top:1px solid var(–border)}
+.ri-expand.open{max-height:380px}
+.ri-expand-inner{padding:11px 13px 13px}
+.ri-arrow{font-size:10px;color:var(–muted);margin-left:5px;transition:transform .3s;display:inline-block}
+.ri.expanded .ri-arrow{transform:rotate(180deg)}
+.tipo-toggle{display:flex;gap:5px;margin-bottom:9px}
+.tipo-btn{flex:1;padding:7px;border-radius:9px;background:rgba(255,255,255,.04);
+border:1px solid var(–border);color:var(–muted);font-size:11.5px;
+font-family:‘Outfit’,sans-serif;font-weight:500;cursor:pointer;transition:all .2s}
+.tipo-btn.active{background:rgba(91,156,246,.14);border-color:rgba(91,156,246,.3);color:var(–text)}
+.inp-lbl{font-size:9.5px;color:var(–muted);margin-bottom:4px;font-weight:500;letter-spacing:.04em}
+.ri-input{width:100%;padding:8px 11px;background:rgba(255,255,255,.05);border:1px solid var(–border);
+border-radius:9px;color:var(–text);font-family:‘Outfit’,sans-serif;font-size:12px;outline:none;transition:border-color .2s}
+.ri-input:focus{border-color:rgba(91,156,246,.4)}
+.ri-input::placeholder{color:var(–muted)}
+.hours-row{display:flex;align-items:center;gap:8px}
+.h-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.07);
+border:1px solid var(–border);color:var(–text);font-size:17px;cursor:pointer;
+display:flex;align-items:center;justify-content:center}
+.h-val{font-size:15px;font-weight:600;min-width:28px;text-align:center}
+.h-lbl{font-size:11px;color:var(–muted);margin-left:4px}
+.treino-select{width:100%;padding:8px 30px 8px 11px;background:rgba(255,255,255,.05);
+border:1px solid var(–border);border-radius:9px;color:var(–text);
+font-family:‘Outfit’,sans-serif;font-size:12px;outline:none;
+-webkit-appearance:none;appearance:none;cursor:pointer;
+background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘12’ height=‘8’ viewBox=‘0 0 12 8’%3E%3Cpath d=‘M1 1l5 5 5-5’ stroke=’%2355658a’ stroke-width=‘1.5’ fill=‘none’ stroke-linecap=‘round’/%3E%3C/svg%3E”);
+background-repeat:no-repeat;background-position:right 11px center}
+.treino-select option{background:#141432}
+.t-fields{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}
+.field-lbl{font-size:9.5px;color:var(–muted);margin-bottom:3px;font-weight:500}
+.field-inp{width:100%;padding:7px 9px;background:rgba(255,255,255,.05);
+border:1px solid var(–border);border-radius:9px;color:var(–text);
+font-family:‘Outfit’,sans-serif;font-size:12px;outline:none}
+.field-inp:focus{border-color:rgba(91,156,246,.4)}
+.confirm-btn{width:100%;margin-top:9px;padding:9px;
+background:linear-gradient(135deg,rgba(91,156,246,.18),rgba(167,139,250,.18));
+border:1px solid rgba(91,156,246,.28);border-radius:9px;color:var(–text);
+font-family:‘Outfit’,sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.rest-day{background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(45,212,191,.08));
+border:1px solid rgba(167,139,250,.2);border-radius:16px;padding:20px;text-align:center;margin-bottom:12px}
+.rd-icon{font-size:36px;margin-bottom:8px}
+.rd-title{font-family:‘Playfair Display’,serif;font-size:20px;font-weight:700;margin-bottom:5px}
+.rd-sub{font-size:12px;color:var(–muted);line-height:1.6;margin-bottom:14px}
+.rd-habits{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.rd-habit{background:rgba(255,255,255,.04);border:1px solid var(–border);border-radius:12px;
+padding:12px;cursor:pointer;transition:all .2s;text-align:center}
+.rd-habit.done{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.3)}
+.rd-hicon{font-size:20px;margin-bottom:4px}
+.rd-hname{font-size:11.5px;font-weight:600}
+.rd-hcheck{font-size:10px;color:var(–muted);margin-top:2px}
+.rd-habit.done .rd-hcheck{color:var(–purple)}
+
+/* FINANCEIRO */
+.fin-card{background:var(–card);border:1px solid var(–border);border-radius:16px;padding:15px;margin-bottom:10px}
+.fin-title{font-family:‘Playfair Display’,serif;font-size:16px;font-weight:700;margin-bottom:12px}
+.fin-totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.ft{text-align:center;padding:10px 6px;border-radius:12px}
+.ft-rec{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.18)}
+.ft-desp{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18)}
+.ft-saldo{background:rgba(91,156,246,.08);border:1px solid rgba(91,156,246,.18)}
+.ft-val{font-size:14px;font-weight:700;font-family:‘Playfair Display’,serif}
+.ft-rec .ft-val{color:var(–green)}.ft-desp .ft-val{color:var(–red)}.ft-saldo .ft-val{color:var(–accent)}
+.ft-lbl{font-size:8.5px;color:var(–muted);margin-top:2px}
+.fin-input-row{display:flex;gap:6px;margin-bottom:6px}
+.fin-inp{flex:1;padding:8px 10px;background:rgba(255,255,255,.05);border:1px solid var(–border);
+border-radius:9px;color:var(–text);font-family:‘Outfit’,sans-serif;font-size:12px;outline:none;min-width:0}
+.fin-inp:focus{border-color:rgba(91,156,246,.4)}
+.fin-inp::placeholder{color:var(–muted)}
+.fin-add{display:flex;gap:6px;margin-bottom:12px}
+.fin-add-btn{padding:8px 13px;border-radius:9px;font-family:‘Outfit’,sans-serif;
+font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s}
+.btn-rec{background:rgba(74,222,128,.12);border-color:rgba(74,222,128,.25);color:var(–green)}
+.btn-desp{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.22);color:var(–red)}
+.fin-list{max-height:180px;overflow-y:auto}
+.fin-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(–border);font-size:12px}
+.fin-item:last-child{border-bottom:none}
+.fi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.fi-dot.rec{background:var(–green)}.fi-dot.desp{background:var(–red)}
+.fi-desc{flex:1;color:var(–text)}
+.fi-rec{color:var(–green);font-weight:600}
+.fi-desp{color:var(–red);font-weight:600}
+.fi-del{background:none;border:none;color:var(–muted);cursor:pointer;font-size:14px;padding:0 2px}
+.fin-empty{font-size:11px;color:var(–muted);text-align:center;padding:16px 0}
+
+/* SCORE */
+.medal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
+.medal-card{background:var(–card);border:1px solid var(–border);border-radius:14px;padding:13px 10px;text-align:center}
+.medal-card.earned{border-color:rgba(212,168,67,.35);background:linear-gradient(135deg,rgba(212,168,67,.08),rgba(167,139,250,.06))}
+.medal-icon{font-size:24px;margin-bottom:5px}
+.medal-name{font-size:9.5px;font-weight:600;line-height:1.3}
+.medal-cond{font-size:8.5px;color:var(–muted);margin-top:2px;line-height:1.3}
+.medal-card:not(.earned) .medal-icon{filter:grayscale(1);opacity:.35}
+.medal-card:not(.earned) .medal-name{color:var(–muted)}
+.streak-row{display:flex;gap:3px;flex-wrap:wrap}
+.sd{width:14px;height:14px;border-radius:3px}
+
+/* GRID */
+.day-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.day-cell{aspect-ratio:1;border-radius:8px;background:var(–card);border:1px solid var(–border);
+display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.day-cell.complete{background:linear-gradient(135deg,rgba(91,156,246,.2),rgba(167,139,250,.2));border-color:rgba(167,139,250,.4)}
+.day-cell.partial{background:rgba(91,156,246,.09);border-color:rgba(91,156,246,.17)}
+.day-cell.rest-dc{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2)}
+.day-cell.today-cell{box-shadow:0 0 0 2px var(–gold)}
+.day-num{font-size:8.5px;color:var(–muted);line-height:1}
+.day-star{font-size:12px;line-height:1}
+.day-sc{font-size:8px;color:var(–purple);font-weight:600}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.stat-card{background:var(–card);border:1px solid var(–border);border-radius:14px;padding:14px}
+.stat-icon{font-size:18px;margin-bottom:4px}
+.stat-val{font-family:‘Playfair Display’,serif;font-size:27px;font-weight:700;
+background:linear-gradient(90deg,var(–accent),var(–purple));
+-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-lbl{font-size:9px;color:var(–muted);margin-top:2px;letter-spacing:.06em}
+.hstat{margin-bottom:14px}
+.hstat-head{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px;font-weight:500}
+.hstat-count{color:var(–purple)}
+.hbar{height:4px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(–accent),var(–purple));transition:width .7s}
+.hbar-pct{font-size:9px;color:var(–muted);margin-top:3px}
+.sec-lbl{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(–muted);margin-bottom:10px;font-weight:500}
+.exp-btn{width:100%;padding:13px;background:linear-gradient(135deg,rgba(91,156,246,.12),rgba(167,139,250,.12));
+border:1px solid rgba(91,156,246,.22);border-radius:13px;color:var(–text);
+font-family:‘Outfit’,sans-serif;font-size:12.5px;font-weight:500;
+cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s;margin-bottom:6px}
+.exp-hint{font-size:9.5px;color:var(–muted);text-align:center;line-height:1.6;margin-bottom:12px}
+
+/* CICLOS */
+.cycle-card{background:var(–card);border:1px solid var(–border);border-radius:14px;padding:14px;margin-bottom:9px}
+.cycle-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.cycle-title{font-family:‘Playfair Display’,serif;font-size:15px;font-weight:700}
+.cy-badge{font-size:10px;padding:2px 9px;border-radius:99px;font-weight:600}
+.cy-active{background:rgba(74,222,128,.12);color:var(–green);border:1px solid rgba(74,222,128,.25)}
+.cy-done{background:rgba(167,139,250,.12);color:var(–purple);border:1px solid rgba(167,139,250,.25)}
+.cy-dates{font-size:10px;color:var(–muted);margin-bottom:9px}
+.cy-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.cs{background:rgba(255,255,255,.04);border-radius:9px;padding:7px;text-align:center}
+.cs-val{font-size:13px;font-weight:700}.cs-lbl{font-size:8px;color:var(–muted);margin-top:2px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);
+z-index:200;display:flex;align-items:flex-end;justify-content:center;
+opacity:0;pointer-events:none;transition:opacity .22s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(–s1);border:1px solid var(–border);border-radius:22px 22px 0 0;
+padding:22px 18px calc(var(–safe-b)+26px);width:100%;max-width:430px;
+transform:translateY(100%);transition:transform .3s cubic-bezier(.23,1,.32,1)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-handle{width:34px;height:4px;background:rgba(255,255,255,.13);border-radius:99px;margin:0 auto 18px}
+.modal-title{font-family:‘Playfair Display’,serif;font-size:19px;font-weight:700;margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(–muted);margin-bottom:20px;line-height:1.6}
+.modal-btn{width:100%;padding:13px;border-radius:13px;font-family:‘Outfit’,sans-serif;
+font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;
+gap:10px;margin-bottom:8px;transition:all .2s;border:1px solid}
+.mb-blue{background:rgba(91,156,246,.12);border-color:rgba(91,156,246,.25);color:var(–text)}
+.mb-gold{background:rgba(212,168,67,.08);border-color:rgba(212,168,67,.22);color:rgba(212,168,67,.9)}
+.mb-green{background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.25);color:rgba(74,222,128,.95)}
+.mb-muted{background:rgba(255,255,255,.04);border-color:var(–border);color:var(–muted)}
+.modal-warn{font-size:10.5px;color:rgba(248,113,113,.7);margin-top:3px;text-align:center}
+.install-banner{margin:9px 15px;padding:12px 13px;background:rgba(212,168,67,.07);
+border:1px solid rgba(212,168,67,.2);border-radius:13px;display:flex;gap:9px;align-items:flex-start}
+.ib-text{font-size:11px;color:rgba(212,168,67,.85);line-height:1.6;flex:1}
+.ib-text strong{color:var(–gold)}
+.ib-close{background:none;border:none;color:var(–muted);font-size:15px;cursor:pointer;padding:0;flex-shrink:0}
+.toast{position:fixed;bottom:calc(var(–safe-b)+16px);left:50%;
+transform:translateX(-50%) translateY(55px);background:rgba(14,14,36,.97);
+backdrop-filter:blur(20px);border:1px solid var(–border);border-radius:50px;
+padding:9px 20px;font-size:12px;color:var(–text);white-space:nowrap;
+transition:transform .26s cubic-bezier(.23,1,.32,1);z-index:999;font-weight:500}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.bottom-pad{height:calc(var(–safe-b)+22px)}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <div class="install-banner" id="ib">
+    <div style="font-size:19px;flex-shrink:0">📲</div>
+    <div class="ib-text"><strong>Salvar na tela inicial:</strong> Safari → <strong>compartilhar ↑</strong> → <strong>"Adicionar à Tela de Início"</strong></div>
+    <button class="ib-close" onclick="document.getElementById('ib').style.display='none'">✕</button>
+  </div>
+  <div class="header">
+    <div class="hrow1">
+      <div>
+        <div class="h-eye">Marlon Souza · Sistema de Evolução</div>
+        <div class="h-title">Ciclo de 90 Dias</div>
+        <div class="h-badges">
+          <div class="hbadge hb-notif" id="notifBtn" onclick="toggleNotif()"><span id="notifIcon">🔕</span><span id="notifLbl">Alertas</span></div>
+          <div class="hbadge hb-backup" onclick="openModal()">💾 Backup</div>
+          <div class="hbadge hb-weekend" id="weekendBtn" onclick="toggleRestDay()"><span id="wdIcon">🌿</span><span id="wdLbl">Descanso</span></div>
+        </div>
+      </div>
+      <div class="h-right">
+        <div class="h-clock" id="clock">--:--</div>
+        <div class="h-date" id="liveDate">--</div>
+      </div>
+    </div>
+    <div class="prog-meta"><span id="progLabel">Ciclo 1 · 0 dias completos</span><span id="progPct">0%</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+  <div class="streak-banner">
+    <div class="sb-icon">🔥</div>
+    <div class="sb-text">
+      <div class="sb-val" id="streakVal">0 dias seguidos</div>
+      <div class="sb-sub" id="streakSub">Complete hoje para iniciar sua sequência</div>
+    </div>
+    <div class="sb-medal" id="streakMedal">—</div>
+  </div>
+  <div class="nav">
+    <button class="nav-btn" onclick="showView('dash',this)">📊 Status</button>
+    <button class="nav-btn active" onclick="showView('hoje',this)">☀️ Hoje</button>
+    <button class="nav-btn" onclick="showView('fin',this)">💰 Fin.</button>
+    <button class="nav-btn" onclick="showView('score',this)">🏅</button>
+    <button class="nav-btn" onclick="showView('grid',this)">📅</button>
+    <button class="nav-btn" onclick="showView('ciclos',this)">🔄</button>
+  </div>
+
+  <!-- DASHBOARD -->
+
+  <div class="view" id="view-dash"><div id="dash-container"></div><div class="bottom-pad"></div></div>
+
+  <!-- HOJE -->
+
+  <div class="view active" id="view-hoje">
+    <div id="rest-day-container"></div>
+    <div id="rotina-container">
+      <div class="sdiv"><span>🌅 manhã</span></div>
+      <div class="ri" id="ri-agua" onclick="toggleSimple('agua')"><div class="ri-stripe"></div><div class="ri-main"><div class="ri-top"><div class="ri-time-block"><div class="ri-time">05:00</div><div class="ri-dur">10 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">🌅 Acordar &amp; Hidratação</div><div class="ri-sub">Levantar · 300ml de água</div></div><div class="ri-check" id="chk-agua">○</div></div></div></div>
+      <div class="ri" id="ri-leitura"><div class="ri-stripe"></div><div class="ri-main">
+        <div class="ri-top" onclick="toggleExpand('lp','leitura')"><div class="ri-time-block"><div class="ri-time">05:10</div><div class="ri-dur">20 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">📖 Bíblia / Livro <span class="ri-arrow" id="arrow-leitura">▾</span></div><div class="ri-sub" id="sub-leitura">1 cap. ou 10 págs · Reflexões</div></div><div class="ri-check" id="chk-leitura">○</div></div>
+        <div class="ri-expand" id="lp"><div class="ri-expand-inner">
+          <div class="tipo-toggle"><button class="tipo-btn active" id="tipo-biblia" onclick="setTipo('biblia')">✝️ Bíblia</button><button class="tipo-btn" id="tipo-livro" onclick="setTipo('livro')">📚 Livro</button></div>
+          <div id="biblia-fields"><div class="inp-lbl">LIVRO E CAPÍTULO</div><input class="ri-input" id="biblia-ref" placeholder="Ex: João 3, Salmos 23…" oninput="saveLeitura()"></div>
+          <div id="livro-fields" style="display:none"><div class="inp-lbl">TÍTULO DO LIVRO</div><input class="ri-input" id="livro-titulo" placeholder="Nome do livro…" oninput="saveLeitura()"><div class="inp-lbl" style="margin-top:7px">PÁGINAS LIDAS</div><input class="ri-input" id="livro-pags" placeholder="Ex: 42 – 52" oninput="saveLeitura()"></div>
+          <div style="margin-top:8px"><div class="inp-lbl">REFLEXÃO</div><textarea class="ri-input" id="leitura-refl" rows="2" placeholder="O que marcou hoje…" style="resize:none" oninput="saveLeitura()"></textarea></div>
+          <button class="confirm-btn" onclick="confirmLeitura()">✓ Confirmar Leitura</button>
+        </div></div>
+      </div></div>
+      <div class="ri" id="ri-banho" onclick="toggleSimple('banho')"><div class="ri-stripe"></div><div class="ri-main"><div class="ri-top"><div class="ri-time-block"><div class="ri-time">05:35</div><div class="ri-dur">5 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">🚿 Banho Frio</div><div class="ri-sub">Ativa o corpo · Foco</div></div><div class="ri-check" id="chk-banho">○</div></div></div></div>
+      <div class="ri" id="ri-estudo"><div class="ri-stripe"></div><div class="ri-main">
+        <div class="ri-top" onclick="toggleExpand('ep','estudo')"><div class="ri-time-block"><div class="ri-time">05:50</div><div class="ri-dur">70 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">📊 Estudo <span class="ri-arrow" id="arrow-estudo">▾</span></div><div class="ri-sub" id="sub-estudo">Análise Operacional · Foco total</div></div><div class="ri-check" id="chk-estudo">○</div></div>
+        <div class="ri-expand" id="ep"><div class="ri-expand-inner">
+          <div class="inp-lbl">HORAS ESTUDADAS</div>
+          <div class="hours-row"><button class="h-btn" onclick="changeHours(-0.5,event)">−</button><div class="h-val" id="hoursVal">0h</div><button class="h-btn" onclick="changeHours(0.5,event)">+</button><span class="h-lbl">horas</span></div>
+          <div style="margin-top:8px"><div class="inp-lbl">TEMA ESTUDADO</div><input class="ri-input" id="estudo-tema" placeholder="Ex: Price Action, Order Flow…" oninput="saveEstudo()"></div>
+        </div></div>
+      </div></div>
+      <div class="ri" id="ri-trabalho" onclick="toggleSimple('trabalho')"><div class="ri-stripe"></div><div class="ri-main"><div class="ri-top"><div class="ri-time-block"><div class="ri-time">07:00</div><div class="ri-dur">30 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">👔 Prep. p/ Trabalho</div><div class="ri-sub">Pronto para sair</div></div><div class="ri-check" id="chk-trabalho">○</div></div></div></div>
+      <div class="sdiv"><span>🌙 noite</span></div>
+      <div class="ri" id="ri-treino"><div class="ri-stripe"></div><div class="ri-main">
+        <div class="ri-top" onclick="toggleExpand('tp','treino')"><div class="ri-time-block"><div class="ri-time">19:40</div><div class="ri-dur">50 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">💪 Treino <span class="ri-arrow" id="arrow-treino">▾</span></div><div class="ri-sub" id="sub-treino">Academia · Bicicleta · Corrida · Natação</div></div><div class="ri-check" id="chk-treino">○</div></div>
+        <div class="ri-expand" id="tp"><div class="ri-expand-inner">
+          <div class="inp-lbl">MODALIDADE</div>
+          <select class="treino-select" id="treino-tipo" onchange="onTreinoChange()"><option value="">— Selecionar —</option><option value="academia">🏋️ Academia</option><option value="bicicleta">🚴 Bicicleta</option><option value="corrida">🏃 Corrida</option><option value="natacao">🏊 Natação</option><option value="outro">⚽ Outro</option></select>
+          <div class="t-fields" id="t-fields" style="display:none"><div><div class="field-lbl">DURAÇÃO (min)</div><input class="field-inp" id="t-dur" type="number" placeholder="50" min="1" max="300" oninput="saveTreino()"></div><div id="t-dist-wrap"><div class="field-lbl" id="t-dist-lbl">DISTÂNCIA (km)</div><input class="field-inp" id="t-dist" type="number" placeholder="10.5" step="0.1" min="0" oninput="saveTreino()"></div></div>
+          <div id="t-outro-wrap" style="display:none;margin-top:7px"><div class="inp-lbl">QUAL ESPORTE?</div><input class="ri-input" id="t-outro" placeholder="Ex: Futebol, Tênis…" oninput="saveTreino()"></div>
+          <button class="confirm-btn" onclick="confirmTreino()">✓ Confirmar Treino</button>
+        </div></div>
+      </div></div>
+      <div class="ri" id="ri-jantar" onclick="toggleSimple('jantar')"><div class="ri-stripe"></div><div class="ri-main"><div class="ri-top"><div class="ri-time-block"><div class="ri-time">20:40</div><div class="ri-dur">30 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">🍽️ Jantar</div><div class="ri-sub">Refeição pós-treino</div></div><div class="ri-check" id="chk-jantar">○</div></div></div></div>
+      <div class="ri" id="ri-esposa" onclick="toggleSimple('esposa')"><div class="ri-stripe"></div><div class="ri-main"><div class="ri-top"><div class="ri-time-block"><div class="ri-time">21:10</div><div class="ri-dur">50 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">🫶 Momento c/ Esposa</div><div class="ri-sub">Qualidade · Sem distrações</div></div><div class="ri-check" id="chk-esposa">○</div></div></div></div>
+      <div class="ri" id="ri-dormir" onclick="toggleSimple('dormir')"><div class="ri-stripe"></div><div class="ri-main"><div class="ri-top"><div class="ri-time-block"><div class="ri-time">22:00</div><div class="ri-dur">30 min</div></div><div class="ri-vline"></div><div class="ri-content"><div class="ri-name">🛏️ Prep. p/ Dormir</div><div class="ri-sub">Leitura leve · Reflexão · 22:30 dormir</div></div><div class="ri-check" id="chk-dormir">○</div></div></div></div>
+    </div>
+    <div class="bottom-pad"></div>
+  </div>
+
+  <!-- FINANÇAS -->
+
+  <div class="view" id="view-fin"><div id="fin-cards-container"></div><div class="bottom-pad"></div></div>
+
+  <!-- SCORE -->
+
+  <div class="view" id="view-score">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;margin-top:4px">
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700">🏅 Medalhas</div>
+      <div style="font-size:11px;color:var(--muted)" id="scoreTotal">0/12</div>
+    </div>
+    <div class="medal-grid" id="medalGrid"></div>
+    <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Mapa de Consistência</div>
+    <div class="streak-row" id="streakRow"></div>
+    <div class="bottom-pad"></div>
+  </div>
+
+  <!-- GRID -->
+
+  <div class="view" id="view-grid">
+    <div class="day-grid" id="dayGrid"></div>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+      <div class="sec-lbl">Estatísticas</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">🗓️</div><div class="stat-val" id="stDays">0</div><div class="stat-lbl">DIAS COMPLETOS</div></div>
+        <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-val" id="stPct">0%</div><div class="stat-lbl">DO CICLO</div></div>
+      </div>
+      <div class="sec-lbl">Por hábito</div>
+      <div class="hstat"><div class="hstat-head"><span>🌅 Acordar às 5h</span><span class="hstat-count" id="ss-agua">0</span></div><div class="hbar"><div class="hbar-fill" id="sb-agua" style="width:0%"></div></div><div class="hbar-pct" id="sp-agua">0%</div></div>
+      <div class="hstat"><div class="hstat-head"><span>📖 Leitura</span><span class="hstat-count" id="ss-leitura">0</span></div><div class="hbar"><div class="hbar-fill" id="sb-leitura" style="width:0%"></div></div><div class="hbar-pct" id="sp-leitura">0%</div></div>
+      <div class="hstat"><div class="hstat-head"><span>📊 Estudo</span><span class="hstat-count" id="ss-estudo">0h</span></div><div class="hbar"><div class="hbar-fill" id="sb-estudo" style="width:0%"></div></div><div class="hbar-pct" id="sp-estudo">meta 70h</div></div>
+      <div class="hstat"><div class="hstat-head"><span>💪 Treinos</span><span class="hstat-count" id="ss-treino">0</span></div><div class="hbar"><div class="hbar-fill" id="sb-treino" style="width:0%"></div></div><div class="hbar-pct" id="sp-treino">meta 70</div></div>
+      <div style="margin-top:16px"><button class="exp-btn" onclick="exportExcel()"><span>📥</span>Baixar Planilha Excel</button><div class="exp-hint">Todos os ciclos · hábitos · finanças</div></div>
+    </div>
+    <div class="bottom-pad"></div>
+  </div>
+
+  <!-- CICLOS -->
+
+  <div class="view" id="view-ciclos"><div id="ciclos-list"></div><div class="bottom-pad"></div></div>
+</div>
+
+<!-- MODAL -->
+
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💾 Backup &amp; Ciclos</div>
+    <div class="modal-sub">Proteja seus dados e gerencie seus ciclos.</div>
+    <button class="modal-btn mb-blue" onclick="backupExport()"><span>📤</span><div><div>Exportar Backup (JSON)</div><div style="font-size:10px;color:var(--muted);margin-top:1px">Salva tudo no iPhone</div></div></button>
+    <button class="modal-btn mb-gold" onclick="document.getElementById('fileIn').click()"><span>📥</span><div><div>Importar Backup (JSON)</div><div style="font-size:10px;color:rgba(212,168,67,.5);margin-top:1px">Restaura de um backup</div></div></button>
+    <input type="file" id="fileIn" accept=".json" style="display:none" onchange="backupImport(event)">
+    <button class="modal-btn mb-green" onclick="confirmNewCycle()"><span>🔄</span><div><div>Iniciar Ciclo <span id="nextCNum">2</span></div><div style="font-size:10px;color:rgba(74,222,128,.55);margin-top:1px">Mantém histórico · Zera os 90 dias</div></div></button>
+    <div class="modal-warn" id="cycleWarn" style="display:none">⚠️ Exporte um backup antes!</div>
+    <button class="modal-btn mb-muted" onclick="closeModal(null)" style="margin-top:4px"><span>✕</span><span>Fechar</span></button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var TOTAL = 90;
+var SK = 'c90_v6';
+
+var RTIME = [
+  {id:'agua',start:'05:00',end:'05:10'},
+  {id:'leitura',start:'05:10',end:'05:30'},
+  {id:'banho',start:'05:35',end:'05:40'},
+  {id:'estudo',start:'05:50',end:'07:00'},
+  {id:'trabalho',start:'07:00',end:'07:30'},
+  {id:'treino',start:'19:40',end:'20:30'},
+  {id:'jantar',start:'20:40',end:'21:10'},
+  {id:'esposa',start:'21:10',end:'22:00'},
+  {id:'dormir',start:'22:00',end:'22:30'}
+];
+
+var MEDALS = [
+  {id:'m1',icon:'🌱',name:'Primeira Semente',cond:'1 dia completo',chk:function(d){return d.filter(isComplete).length>=1;}},
+  {id:'m2',icon:'🔥',name:'7 Dias de Fogo',cond:'7 dias completos',chk:function(d){return d.filter(isComplete).length>=7;}},
+  {id:'m3',icon:'⚡',name:'Sequência 7',cond:'7 dias seguidos',chk:function(d){return calcStreak(d)>=7;}},
+  {id:'m4',icon:'🌕',name:'Lua Cheia',cond:'30 dias completos',chk:function(d){return d.filter(isComplete).length>=30;}},
+  {id:'m5',icon:'💎',name:'Diamante',cond:'30 dias seguidos',chk:function(d){return calcStreak(d)>=30;}},
+  {id:'m6',icon:'🌄',name:'Madrugador',cond:'20x acordou 5h',chk:function(d){return d.filter(function(x){return x.agua;}).length>=20;}},
+  {id:'m7',icon:'📚',name:'Estudioso',cond:'50h de estudo',chk:function(d){return d.reduce(function(a,x){return a+x.estudo;},0)>=50;}},
+  {id:'m8',icon:'🏆',name:'Atleta',cond:'30 treinos',chk:function(d){return d.filter(function(x){return x.treino;}).length>=30;}},
+  {id:'m9',icon:'✝️',name:'Sábio',cond:'60 leituras',chk:function(d){return d.filter(function(x){return x.leitura;}).length>=60;}},
+  {id:'m10',icon:'👑',name:'Ciclo Completo',cond:'90 dias',chk:function(d){return d.filter(isComplete).length>=90;}},
+  {id:'m11',icon:'🧠',name:'Disciplina Total',cond:'Score 80%',chk:function(d){var done=d.filter(isComplete).length,tot=d.filter(function(x){return !x.restDay;}).length||1;return done/tot>=0.8;}},
+  {id:'m12',icon:'💰',name:'Consciência Fin.',cond:'30 dias c/ finanças',chk:function(d){return d.filter(function(x){return (x.fin||[]).length>0;}).length>=30;}}
+];
+
+function emptyDay(){
+  return {agua:false,leitura:false,leituraTipo:'',leituraRef:'',leituraRefl:'',
+    banho:false,estudo:0,estudoTema:'',trabalho:false,
+    treino:false,treinoTipo:'',treinoDur:'',treinoDist:'',treinoOutro:'',
+    jantar:false,esposa:false,dormir:false,restDay:false,fin:[]};
+}
+
+function loadState(){
+  try{var s=localStorage.getItem(SK);if(s)return JSON.parse(s);}catch(e){}
+  var now=new Date();now.setHours(0,0,0,0);
+  return{currentCycle:1,notifEnabled:false,
+    cycles:[{num:1,start:now.toISOString(),end:null,data:Array.from({length:TOTAL},emptyDay)}]};
+}
+var state = loadState();
+function save(){try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){}}
+function cd(){return state.cycles[state.cycles.length-1];}
+function days(){return cd().data;}
+function todayIdx(){return Math.max(0,Math.min(Math.floor((Date.now()-new Date(cd().start).getTime())/86400000),TOTAL-1));}
+function isComplete(d){return !d.restDay&&d.agua&&d.leitura&&d.estudo>0&&d.treino;}
+function dayScore(d){if(d.restDay)return -1;return [d.agua,d.leitura,d.estudo>0,d.treino].filter(Boolean).length;}
+function toMins(t){var p=t.split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+function nowMins(){var n=new Date();return n.getHours()*60+n.getMinutes();}
+function calcStreak(arr){
+  var max=0,cur=0;
+  for(var i=arr.length-1;i>=0;i--){
+    if(arr[i].restDay){cur++;continue;}
+    if(isComplete(arr[i])){cur++;if(cur>max)max=cur;}else{cur=0;}
+  }
+  return max;
+}
+function calcCurrentStreak(arr){
+  var s=0;
+  for(var i=todayIdx();i>=0;i--){
+    if(arr[i].restDay){s++;continue;}
+    if(isComplete(arr[i]))s++;else break;
+  }
+  return s;
+}
+function fmtMoney(v){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtMoneyShort(v){if(v>=1000)return 'R$ '+(v/1000).toFixed(1)+'k';return 'R$ '+v.toFixed(0);}
+
+// NOTIFICAÇÕES
+var nTimers=[];
+var NSCH=[
+  {id:'agua',label:'🌅 Hora de acordar!',msg:'Levante e beba 300ml de água. Bom dia, Marlon!'},
+  {id:'leitura',label:'📖 Hora da leitura!',msg:'Abra a Bíblia ou seu livro.'},
+  {id:'banho',label:'🚿 Banho frio!',msg:'5 minutos que vão energizar seu dia.'},
+  {id:'estudo',label:'📊 Bloco de estudo!',msg:'Foco total. Desligue notificações.'},
+  {id:'trabalho',label:'👔 Hora de se preparar!',msg:'Pronto para o trabalho.'},
+  {id:'treino',label:'💪 Hora do treino!',msg:'Academia, bicicleta, corrida ou natação!'},
+  {id:'jantar',label:'🍽️ Hora do jantar!',msg:'Refeição pós-treino.'},
+  {id:'esposa',label:'🫶 Momento com a esposa!',msg:'Deixe o celular. Tempo de qualidade.'},
+  {id:'dormir',label:'🛏️ Preparação para dormir!',msg:'Em 30 minutos durma.'}
+];
+function toggleNotif(){
+  if(!('Notification' in window)){showToast('❌ Não suportado aqui');return;}
+  if(!state.notifEnabled){
+    Notification.requestPermission().then(function(p){
+      if(p!=='granted'){showToast('⚠️ Permissão negada');return;}
+      state.notifEnabled=true;save();scheduleNotifs();showToast('🔔 Alertas ativados!');updateNotifBtn();
+    });
+  } else {
+    state.notifEnabled=false;save();
+    nTimers.forEach(function(t){clearTimeout(t);});nTimers=[];
+    showToast('🔕 Desativados');updateNotifBtn();
+  }
+}
+function updateNotifBtn(){
+  var b=document.getElementById('notifBtn'),i=document.getElementById('notifIcon'),l=document.getElementById('notifLbl');
+  if(state.notifEnabled){b.classList.add('on');i.textContent='🔔';l.textContent='Alertas on';}
+  else{b.classList.remove('on');i.textContent='🔕';l.textContent='Alertas';}
+}
+function scheduleNotifs(){
+  nTimers.forEach(function(t){clearTimeout(t);});nTimers=[];
+  if(!state.notifEnabled||Notification.permission!=='granted')return;
+  var now=new Date();
+  NSCH.forEach(function(item){
+    var rt=RTIME.filter(function(r){return r.id===item.id;})[0];
+    if(!rt)return;
+    var p=rt.start.split(':'),h=parseInt(p[0]),m=parseInt(p[1]);
+    var t=new Date();t.setHours(h,m,0,0);
+    var delay=t.getTime()-now.getTime();
+    if(delay>0){nTimers.push(setTimeout(function(it){return function(){
+      if(state.notifEnabled&&Notification.permission==='granted')
+        new Notification(it.label,{body:it.msg});
+    };}(item),delay));}
+  });
+}
+function scheduleNextDay(){
+  var n=new Date(),m=new Date();m.setHours(24,0,0,0);
+  setTimeout(function(){scheduleNotifs();scheduleNextDay();},m.getTime()-n.getTime());
+}
+
+// REST DAY
+function toggleRestDay(){
+  var idx=todayIdx(),d=days();
+  d[idx].restDay=!d[idx].restDay;save();
+  renderRestDay();updateStatuses();updateHeader();updateStreak();renderMedals();
+  showToast(d[idx].restDay?'🌿 Dia de descanso ativado':'💪 Modo rotina ativado');
+}
+function renderRestDay(){
+  var idx=todayIdx(),d=days()[idx];
+  var rc=document.getElementById('rest-day-container');
+  var rot=document.getElementById('rotina-container');
+  var btn=document.getElementById('weekendBtn');
+  var wdI=document.getElementById('wdIcon'),wdL=document.getElementById('wdLbl');
+  if(d.restDay){
+    btn.classList.add('rest');wdI.textContent='🌿';wdL.textContent='Descanso ON';
+    rot.style.display='none';
+    var h='<div class="rest-day">';
+    h+='<div class="rd-icon">🌿</div>';
+    h+='<div class="rd-title">Dia de Descanso</div>';
+    h+='<div class="rd-sub">Seu corpo e mente merecem recuperar.<br>Hábitos opcionais para hoje:</div>';
+    h+='<div class="rd-habits">';
+    h+='<div class="rd-habit '+(d.leitura?'done':'')+'" onclick="toggleRestHabit(\'leitura\')"><div class="rd-hicon">📖</div><div class="rd-hname">Leitura</div><div class="rd-hcheck">'+(d.leitura?'✓ Feito':'Opcional')+'</div></div>';
+    h+='<div class="rd-habit '+(d.esposa?'done':'')+'" onclick="toggleRestHabit(\'esposa\')"><div class="rd-hicon">🫶</div><div class="rd-hname">Esposa</div><div class="rd-hcheck">'+(d.esposa?'✓ Feito':'Opcional')+'</div></div>';
+    h+='<div class="rd-habit '+(d.treino?'done':'')+'" onclick="toggleRestHabit(\'treino\')"><div class="rd-hicon">🚶</div><div class="rd-hname">Mov. Leve</div><div class="rd-hcheck">'+(d.treino?'✓ Feito':'Opcional')+'</div></div>';
+    h+='<div class="rd-habit '+(d.dormir?'done':'')+'" onclick="toggleRestHabit(\'dormir\')"><div class="rd-hicon">🛏️</div><div class="rd-hname">Dormir</div><div class="rd-hcheck">'+(d.dormir?'✓ Feito':'Opcional')+'</div></div>';
+    h+='</div>';
+    h+='<button onclick="toggleRestDay()" style="width:100%;padding:10px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:Outfit,sans-serif;font-size:12px;cursor:pointer">↩ Voltar à rotina</button>';
+    h+='</div>';
+    rc.innerHTML=h;
+  } else {
+    btn.classList.remove('rest');wdI.textContent='🌿';wdL.textContent='Descanso';
+    rot.style.display='block';rc.innerHTML='';
+  }
+}
+function toggleRestHabit(id){
+  var idx=todayIdx(),d=days();
+  d[idx][id]=!d[idx][id];save();renderRestDay();updateStreak();
+  showToast(d[idx][id]?'✓ Marcado!':'Desmarcado');
+}
+
+// BACKUP
+function backupExport(){
+  var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='Ciclo90_Backup_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.json';
+  a.click();URL.revokeObjectURL(url);
+  showToast('📤 Backup exportado!');closeModal(null);
+}
+function backupImport(e){
+  var file=e.target.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var imp=JSON.parse(ev.target.result);
+      if(!imp.cycles||!imp.currentCycle)throw new Error('invalid');
+      state=imp;save();
+      syncTodayUI();updateHeader();updateStreak();renderMedals();renderCiclos();
+      showToast('✅ Backup restaurado!');closeModal(null);
+    }catch(ex){showToast('❌ Arquivo inválido');}
+  };
+  r.readAsText(file);e.target.value='';
+}
+function confirmNewCycle(){
+  var done=days().filter(isComplete).length;
+  if(done<3){document.getElementById('cycleWarn').style.display='block';return;}
+  cd().end=new Date().toISOString();
+  var n=new Date();n.setHours(0,0,0,0);
+  state.currentCycle++;
+  state.cycles.push({num:state.currentCycle,start:n.toISOString(),end:null,data:Array.from({length:TOTAL},emptyDay)});
+  save();syncTodayUI();updateHeader();renderCiclos();
+  showToast('🚀 Ciclo '+state.currentCycle+' iniciado!');closeModal(null);
+}
+function openModal(){
+  document.getElementById('nextCNum').textContent=state.currentCycle+1;
+  document.getElementById('cycleWarn').style.display='none';
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(e){
+  if(e===null||e.target===document.getElementById('modal'))
+    document.getElementById('modal').classList.remove('open');
+}
+
+// HÁBITOS
+function toggleSimple(id){
+  var idx=todayIdx(),d=days();
+  d[idx][id]=!d[idx][id];save();
+  var c=document.getElementById('chk-'+id);if(c)c.textContent=d[idx][id]?'✓':'○';
+  updateStatuses();updateHeader();updateStreak();renderMedals();
+  showToast(d[idx][id]?'✓ Marcado!':'Desmarcado');
+}
+function toggleExpand(panelId,riId){
+  var p=document.getElementById(panelId),r=document.getElementById('ri-'+riId);
+  var open=p.classList.contains('open');
+  document.querySelectorAll('.ri-expand.open').forEach(function(x){x.classList.remove('open');});
+  document.querySelectorAll('.ri.expanded').forEach(function(x){x.classList.remove('expanded');});
+  if(!open){p.classList.add('open');r.classList.add('expanded');}
+}
+var lTipo='biblia';
+function setTipo(t){
+  lTipo=t;
+  document.getElementById('tipo-biblia').classList.toggle('active',t==='biblia');
+  document.getElementById('tipo-livro').classList.toggle('active',t==='livro');
+  document.getElementById('biblia-fields').style.display=t==='biblia'?'block':'none';
+  document.getElementById('livro-fields').style.display=t==='livro'?'block':'none';
+}
+function saveLeitura(){
+  var d=days()[todayIdx()];
+  d.leituraTipo=lTipo;
+  d.leituraRef=lTipo==='biblia'?document.getElementById('biblia-ref').value:
+    document.getElementById('livro-titulo').value+' p.'+document.getElementById('livro-pags').value;
+  d.leituraRefl=document.getElementById('leitura-refl').value;save();
+}
+function confirmLeitura(){
+  saveLeitura();var d=days()[todayIdx()];d.leitura=true;save();
+  document.getElementById('chk-leitura').textContent='✓';
+  document.getElementById('sub-leitura').textContent=(lTipo==='biblia'?'✝️ ':'📚 ')+(d.leituraRef||'Concluído');
+  updateStatuses();updateHeader();updateStreak();renderMedals();showToast('📖 Leitura confirmada!');
+}
+function changeHours(delta,e){
+  if(e)e.stopPropagation();
+  var d=days()[todayIdx()];
+  d.estudo=Math.max(0,Math.min(12,Math.round((d.estudo+delta)*2)/2));save();
+  document.getElementById('hoursVal').textContent=d.estudo+'h';
+  document.getElementById('chk-estudo').textContent=d.estudo>0?'✓':'○';
+  updateStatuses();updateHeader();updateStreak();renderMedals();
+}
+function saveEstudo(){days()[todayIdx()].estudoTema=document.getElementById('estudo-tema').value;save();}
+function onTreinoChange(){
+  var t=document.getElementById('treino-tipo').value;
+  document.getElementById('t-fields').style.display=(t&&t!=='outro')?'grid':'none';
+  document.getElementById('t-outro-wrap').style.display=t==='outro'?'block':'none';
+  document.getElementById('t-dist-wrap').style.display=t==='academia'?'none':'block';
+  document.getElementById('t-dist-lbl').textContent=t==='natacao'?'DISTÂNCIA (m)':'DISTÂNCIA (km)';
+  saveTreino();
+}
+function saveTreino(){
+  var d=days()[todayIdx()];
+  d.treinoTipo=document.getElementById('treino-tipo').value;
+  d.treinoDur=document.getElementById('t-dur').value;
+  d.treinoDist=document.getElementById('t-dist').value;
+  d.treinoOutro=document.getElementById('t-outro').value;save();
+}
+function confirmTreino(){
+  saveTreino();var d=days()[todayIdx()];
+  if(!d.treinoTipo){showToast('⚠️ Selecione a modalidade');return;}
+  d.treino=true;save();
+  var lb={academia:'🏋️ Academia',bicicleta:'🚴 Bicicleta',corrida:'🏃 Corrida',natacao:'🏊 Natação',outro:'⚽ '+d.treinoOutro};
+  var sub=lb[d.treinoTipo]||d.treinoTipo;
+  if(d.treinoDur)sub+=' · '+d.treinoDur+'min';
+  if(d.treinoDist)sub+=' · '+d.treinoDist+(d.treinoTipo==='natacao'?'m':'km');
+  document.getElementById('chk-treino').textContent='✓';
+  document.getElementById('sub-treino').textContent=sub;
+  updateStatuses();updateHeader();updateStreak();renderMedals();showToast('💪 Treino confirmado!');
+}
+
+// FINANÇAS
+function renderFinancas(){
+  var cont=document.getElementById('fin-cards-container');
+  var d=days(),idx=todayIdx(),today=d[idx];
+  var allFin=[],i;
+  for(i=0;i<d.length;i++){if(d[i].fin)allFin=allFin.concat(d[i].fin);}
+  var totalRec=allFin.filter(function(f){return f.tipo==='rec';}).reduce(function(s,f){return s+f.val;},0);
+  var totalDesp=allFin.filter(function(f){return f.tipo==='desp';}).reduce(function(s,f){return s+f.val;},0);
+  var saldo=totalRec-totalDesp;
+  var todayFin=today.fin||[];
+  var tRec=todayFin.filter(function(f){return f.tipo==='rec';}).reduce(function(s,f){return s+f.val;},0);
+  var tDesp=todayFin.filter(function(f){return f.tipo==='desp';}).reduce(function(s,f){return s+f.val;},0);
+  var h='';
+  h+='<div class="fin-card"><div class="fin-title">💰 Ciclo '+state.currentCycle+' — Resumo</div>';
+  h+='<div class="fin-totals"><div class="ft ft-rec"><div class="ft-val">'+fmtMoney(totalRec)+'</div><div class="ft-lbl">RECEITAS</div></div>';
+  h+='<div class="ft ft-desp"><div class="ft-val">'+fmtMoney(totalDesp)+'</div><div class="ft-lbl">DESPESAS</div></div>';
+  h+='<div class="ft ft-saldo"><div class="ft-val">'+fmtMoney(saldo)+'</div><div class="ft-lbl">SALDO</div></div></div></div>';
+  h+='<div class="fin-card"><div class="fin-title">📅 Hoje — Dia '+(idx+1)+'</div>';
+  h+='<div class="fin-totals"><div class="ft ft-rec"><div class="ft-val">'+fmtMoney(tRec)+'</div><div class="ft-lbl">RECEITAS</div></div>';
+  h+='<div class="ft ft-desp"><div class="ft-val">'+fmtMoney(tDesp)+'</div><div class="ft-lbl">DESPESAS</div></div>';
+  h+='<div class="ft ft-saldo"><div class="ft-val">'+fmtMoney(tRec-tDesp)+'</div><div class="ft-lbl">SALDO</div></div></div>';
+  h+='<div class="fin-input-row"><input class="fin-inp" id="fin-desc" placeholder="Descrição…"><input class="fin-inp" id="fin-val" type="number" placeholder="0,00" step="0.01" min="0" style="max-width:100px"></div>';
+  h+='<div class="fin-add"><button class="fin-add-btn btn-rec" onclick="addFin(\'rec\')">+ Receita</button><button class="fin-add-btn btn-desp" onclick="addFin(\'desp\')">− Despesa</button></div>';
+  h+='<div class="fin-list">';
+  if(todayFin.length===0){h+='<div class="fin-empty">Nenhum lançamento hoje</div>';}
+  else{
+    var items=todayFin.slice().reverse();
+    for(i=0;i<items.length;i++){
+      var f=items[i],ri=todayFin.length-1-i;
+      h+='<div class="fin-item"><div class="fi-dot '+f.tipo+'"></div><div class="fi-desc">'+(f.desc||'—')+'</div>';
+      h+='<div class="'+(f.tipo==='rec'?'fi-rec':'fi-desp')+'">'+(f.tipo==='rec'?'+':'−')+fmtMoney(f.val)+'</div>';
+      h+='<button class="fi-del" onclick="delFin('+ri+')">✕</button></div>';
+    }
+  }
+  h+='</div></div>';
+  cont.innerHTML=h;
+}
+function addFin(tipo){
+  var desc=document.getElementById('fin-desc').value.trim();
+  var val=parseFloat(document.getElementById('fin-val').value);
+  if(!val||val<=0){showToast('⚠️ Informe o valor');return;}
+  var idx=todayIdx(),d=days();
+  if(!d[idx].fin)d[idx].fin=[];
+  d[idx].fin.push({tipo:tipo,desc:desc||(tipo==='rec'?'Receita':'Despesa'),val:val,ts:Date.now()});
+  save();renderFinancas();renderMedals();
+  document.getElementById('fin-desc').value='';
+  document.getElementById('fin-val').value='';
+  showToast(tipo==='rec'?'✅ Receita adicionada!':'💸 Despesa registrada!');
+}
+function delFin(i){var idx=todayIdx(),d=days();d[idx].fin.splice(i,1);save();renderFinancas();showToast('Removido');}
+
+// DASHBOARD
+function renderDashboard(){
+  var cont=document.getElementById('dash-container');
+  if(!cont)return;
+  var d=days(),idx=todayIdx(),today=d[idx];
+  var now=new Date();
+  var nm=nowMins();
+  var habitsHoje=[
+    {name:'Acordar & Hidratação',time:'05:00',done:today.agua},
+    {name:'Bíblia / Livro',time:'05:10',done:today.leitura},
+    {name:'Banho Frio',time:'05:35',done:today.banho},
+    {name:'Estudo ('+today.estudo+'h)',time:'05:50',done:today.estudo>0},
+    {name:'Prep. Trabalho',time:'07:00',done:today.trabalho},
+    {name:'Treino',time:'19:40',done:today.treino},
+    {name:'Jantar',time:'20:40',done:today.jantar},
+    {name:'Momento c/ Esposa',time:'21:10',done:today.esposa},
+    {name:'Prep. Dormir',time:'22:00',done:today.dormir}
+  ];
+  var habitDone=habitsHoje.filter(function(h){return h.done;}).length;
+  var habitPct=Math.round(habitDone/habitsHoje.length*100);
+  var done=d.filter(isComplete).length;
+  var pctCiclo=Math.round(done/TOTAL*100);
+  var streak=calcCurrentStreak(d);
+  var totalHoras=d.reduce(function(s,x){return s+x.estudo;},0);
+  var totalTreinos=d.filter(function(x){return x.treino;}).length;
+  var allFin=[],i;
+  for(i=0;i<d.length;i++){if(d[i].fin)allFin=allFin.concat(d[i].fin);}
+  var totalRec=allFin.filter(function(f){return f.tipo==='rec';}).reduce(function(s,f){return s+f.val;},0);
+  var totalDesp=allFin.filter(function(f){return f.tipo==='desp';}).reduce(function(s,f){return s+f.val;},0);
+  var saldo=totalRec-totalDesp;
+  var todayFin=today.fin||[];
+  var tRec=todayFin.filter(function(f){return f.tipo==='rec';}).reduce(function(s,f){return s+f.val;},0);
+  var tDesp=todayFin.filter(function(f){return f.tipo==='desp';}).reduce(function(s,f){return s+f.val;},0);
+  var earnedMedals=MEDALS.filter(function(m){return m.chk(d);});
+  var circleOff=Math.round(163-(163*pctCiclo/100));
+
+  // Hero
+  var h='<div class="dash-hero">';
+  h+='<div class="dh-top"><div>';
+  h+='<div class="dh-greeting">'+now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+'</div>';
+  h+='<div class="dh-name">Olá, Marlon 👋</div>';
+  h+='<div class="dh-cycle">Ciclo '+state.currentCycle+' · Dia '+(idx+1)+' de 90'+(today.restDay?' · 🌿 Descanso':'')+'</div>';
+  h+='</div>';
+  h+='<div class="dh-circle">';
+  h+='<svg width="64" height="64" viewBox="0 0 64 64" style="transform:rotate(-90deg)">';
+  h+='<circle class="dh-circle-bg" cx="32" cy="32" r="26"/>';
+  h+='<circle class="dh-circle-fill" cx="32" cy="32" r="26" style="stroke-dashoffset:'+circleOff+'"/>';
+  h+='</svg>';
+  h+='<div class="dh-circle-label"><div class="dh-circle-pct">'+pctCiclo+'%</div><div class="dh-circle-sub">ciclo</div></div>';
+  h+='</div></div>';
+  h+='<div class="dh-bars">';
+  h+='<div class="dh-bar-item"><div class="dhb-top"><span class="dhb-label">Hoje</span><span class="dhb-val">'+habitDone+'/'+habitsHoje.length+'</span></div><div class="dhb-bar"><div class="dhb-fill" style="width:'+habitPct+'%;background:linear-gradient(90deg,var(--green),var(--teal))"></div></div></div>';
+  h+='<div class="dh-bar-item"><div class="dhb-top"><span class="dhb-label">Sequência</span><span class="dhb-val">'+streak+'d 🔥</span></div><div class="dhb-bar"><div class="dhb-fill" style="width:'+Math.min(100,streak/30*100)+'%;background:linear-gradient(90deg,var(--gold),var(--amber))"></div></div></div>';
+  h+='<div class="dh-bar-item"><div class="dhb-top"><span class="dhb-label">Estudo</span><span class="dhb-val">'+totalHoras+'h</span></div><div class="dhb-bar"><div class="dhb-fill" style="width:'+Math.min(100,totalHoras/70*100)+'%;background:linear-gradient(90deg,var(--accent),var(--purple))"></div></div></div>';
+  h+='<div class="dh-bar-item"><div class="dhb-top"><span class="dhb-label">Treinos</span><span class="dhb-val">'+totalTreinos+'</span></div><div class="dhb-bar"><div class="dhb-fill" style="width:'+Math.min(100,totalTreinos/70*100)+'%;background:linear-gradient(90deg,var(--purple),var(--rose))"></div></div></div>';
+  h+='</div></div>';
+
+  // Cards
+  h+='<div class="dash-cards">';
+  h+='<div class="dash-card dc-hoje"><div class="dc-icon">☀️</div><div class="dc-val" style="color:var(--accent)">'+habitDone+'/'+habitsHoje.length+'</div><div class="dc-lbl">HÁBITOS HOJE</div><div class="dc-sub">'+habitPct+'% do dia</div></div>';
+  h+='<div class="dash-card dc-streak"><div class="dc-icon">🔥</div><div class="dc-val" style="color:var(--gold)">'+streak+'</div><div class="dc-lbl">DIAS SEGUIDOS</div><div class="dc-sub">'+done+' dias completos</div></div>';
+  h+='<div class="dash-card dc-fin"><div class="dc-icon">💰</div><div class="dc-val" style="color:'+(saldo>=0?'var(--green)':'var(--red)')+'">'+fmtMoneyShort(Math.abs(saldo))+'</div><div class="dc-lbl">SALDO DO CICLO</div><div class="dc-sub">'+(saldo>=0?'positivo':'negativo')+'</div></div>';
+  h+='<div class="dash-card dc-medals"><div class="dc-icon">🏅</div><div class="dc-val" style="color:var(--purple)">'+earnedMedals.length+'</div><div class="dc-lbl">MEDALHAS</div><div class="dc-sub">de '+MEDALS.length+' possíveis</div></div>';
+  h+='</div>';
+
+  // Checklist
+  h+='<div class="dash-section"><div class="ds-title">✅ Checklist — Dia '+(idx+1)+'</div>';
+  for(i=0;i<habitsHoje.length;i++){
+    var hh=habitsHoje[i];
+    var s=toMins(hh.time),st='upcoming';
+    if(hh.done)st='done';
+    else if(nm>=s&&nm<s+30)st='now';
+    else if(nm>=s+30)st='missed';
+    h+='<div class="dhl-item '+(hh.done?'done':st==='now'?'now':'')+'">';
+    h+='<div class="dhl-dot"></div>';
+    h+='<div class="dhl-name">'+hh.name+'</div>';
+    h+='<div class="dhl-time">'+hh.time+'</div>';
+    h+='<div class="dhl-check">'+(hh.done?'✅':st==='now'?'⏱':'○')+'</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+
+  // Financeiro hoje
+  h+='<div class="dash-section"><div class="ds-title">💰 Financeiro hoje</div>';
+  h+='<div class="fin-totals-row">';
+  h+='<div class="ftr ftr-rec"><div class="ftr-val">'+fmtMoney(tRec)+'</div><div class="ftr-lbl">RECEITAS</div></div>';
+  h+='<div class="ftr ftr-desp"><div class="ftr-val">'+fmtMoney(tDesp)+'</div><div class="ftr-lbl">DESPESAS</div></div>';
+  h+='<div class="ftr ftr-saldo"><div class="ftr-val">'+fmtMoney(tRec-tDesp)+'</div><div class="ftr-lbl">SALDO</div></div>';
+  h+='</div>';
+  if(todayFin.length===0){h+='<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px 0">Nenhum lançamento hoje</div>';}
+  else{
+    var items3=todayFin.slice(-3).reverse();
+    for(i=0;i<items3.length;i++){
+      var ff=items3[i];
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:11.5px">';
+      h+='<div style="width:6px;height:6px;border-radius:50%;background:'+(ff.tipo==='rec'?'var(--green)':'var(--red)')+';flex-shrink:0"></div>';
+      h+='<div style="flex:1;color:var(--text)">'+(ff.desc||'—')+'</div>';
+      h+='<div style="color:'+(ff.tipo==='rec'?'var(--green)':'var(--red)')+';font-weight:600">'+(ff.tipo==='rec'?'+':'−')+fmtMoney(ff.val)+'</div></div>';
+    }
+  }
+  h+='</div>';
+
+  // Medalhas
+  h+='<div class="dash-section"><div class="ds-title">🏅 Medalhas ('+(earnedMedals.length)+'/'+MEDALS.length+')</div>';
+  if(earnedMedals.length>0){
+    h+='<div class="dm-row">';
+    for(i=0;i<earnedMedals.length;i++){h+='<div class="dm-badge dm-earned" title="'+earnedMedals[i].name+'">'+earnedMedals[i].icon+'</div>';}
+    h+='</div>';
+    var next=null;
+    for(i=0;i<MEDALS.length;i++){if(!MEDALS[i].chk(d)){next=MEDALS[i];break;}}
+    h+='<div style="font-size:10px;color:var(--muted);margin-top:8px">Próxima: '+(next?next.name:'Todas conquistadas! 🎉')+'</div>';
+  } else {h+='<div style="font-size:11px;color:var(--muted)">Complete hábitos para desbloquear 🔒</div>';}
+  h+='</div>';
+
+  // Mapa
+  h+='<div class="dash-section"><div class="ds-title">📅 Mapa do Ciclo</div><div class="mapa-row">';
+  var cComplete=0,cRest=0,cMissed=0;
+  for(i=0;i<d.length;i++){
+    var day=d[i],bg,ti;
+    if(i>idx){bg='rgba(255,255,255,.04)';ti='D'+(i+1);}
+    else if(day.restDay){bg='rgba(167,139,250,.2)';ti='D'+(i+1)+' Descanso';cRest++;}
+    else if(isComplete(day)){bg='linear-gradient(135deg,var(--accent),var(--purple))';ti='D'+(i+1)+' ⭐';cComplete++;}
+    else if(dayScore(day)>0){bg='rgba(91,156,246,.3)';ti='D'+(i+1)+' '+dayScore(day)+'/4';}
+    else{bg='rgba(248,113,113,.2)';ti='D'+(i+1);if(i<=idx)cMissed++;}
+    h+='<div class="mapa-dot" style="background:'+bg+'" title="'+ti+'"></div>';
+  }
+  h+='</div>';
+  h+='<div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">';
+  h+='<span style="font-size:10px;color:var(--muted)">⭐ '+cComplete+' completos</span>';
+  h+='<span style="font-size:10px;color:var(--muted)">🌿 '+cRest+' descanso</span>';
+  h+='<span style="font-size:10px;color:var(--muted)">❌ '+cMissed+' não realizados</span>';
+  h+='</div></div>';
+
+  cont.innerHTML=h;
+}
+
+// STREAK
+function updateStreak(){
+  var d=days(),streak=calcCurrentStreak(d),best=calcStreak(d);
+  document.getElementById('streakVal').textContent=streak===0?'Sequência zerada':streak+' dia'+(streak!==1?'s':'')+' seguido'+(streak!==1?'s':'');
+  document.getElementById('streakSub').textContent=streak>0?'Melhor: '+best+' dias — continue!':'Complete hoje para iniciar sua sequência';
+  var m=streak>=30?'💎':streak>=14?'🔥':streak>=7?'⚡':streak>=3?'✨':'—';
+  document.getElementById('streakMedal').textContent=m;
+}
+
+// MEDALS
+function renderMedals(){
+  var g=document.getElementById('medalGrid');if(!g)return;
+  var d=days(),earned=0,h='';
+  MEDALS.forEach(function(m){
+    var e=m.chk(d);if(e)earned++;
+    h+='<div class="medal-card '+(e?'earned':'')+'"><div class="medal-icon">'+m.icon+'</div><div class="medal-name">'+m.name+'</div><div class="medal-cond">'+m.cond+'</div></div>';
+  });
+  g.innerHTML=h;
+  var sc=document.getElementById('scoreTotal');if(sc)sc.textContent=earned+'/'+MEDALS.length+' · '+Math.round(earned/MEDALS.length*100)+'%';
+}
+function renderStreak(){
+  var row=document.getElementById('streakRow');if(!row)return;
+  var d=days(),h='';
+  d.forEach(function(day,i){
+    var bg,title;
+    if(i>todayIdx()){bg='rgba(255,255,255,.05)';}
+    else if(day.restDay){bg='rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.3)';}
+    else if(isComplete(day)){bg='linear-gradient(135deg,var(--accent),var(--purple))';}
+    else if(dayScore(day)>0){bg='rgba(91,156,246,.25)';}
+    else{bg='rgba(248,113,113,.15)';}
+    h+='<div class="sd" style="background:'+bg+'" title="Dia '+(i+1)+'"></div>';
+  });
+  row.innerHTML=h;
+}
+
+// STATUS
+function getItemStatus(item){
+  var n=nowMins(),s=toMins(item.start),e=toMins(item.end);
+  if(n>=s&&n<e)return 'now';if(n>=e)return 'past';return 'upcoming';
+}
+function updateStatuses(){
+  var today=days()[todayIdx()];
+  RTIME.forEach(function(item){
+    var el=document.getElementById('ri-'+item.id);if(!el)return;
+    var done=item.id==='estudo'?today.estudo>0:today[item.id];
+    var st=getItemStatus(item);
+    el.classList.remove('done','now','missed','upcoming');
+    if(done)el.classList.add('done');
+    else if(st==='now')el.classList.add('now');
+    else if(st==='past')el.classList.add('missed');
+    else el.classList.add('upcoming');
+    var badge=el.querySelector('.now-badge');
+    if(st==='now'&&!done){if(!badge){badge=document.createElement('div');badge.className='now-badge';badge.textContent='AGORA';el.appendChild(badge);}}
+    else{if(badge)badge.remove();}
+  });
+}
+
+// CLOCK
+function updateClock(){
+  var n=new Date();
+  document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('liveDate').textContent=n.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
+  updateStatuses();
+}
+
+// HEADER
+function updateHeader(){
+  var d=days(),done=d.filter(isComplete).length,pct=Math.round(done/TOTAL*100);
+  document.getElementById('progLabel').textContent='Ciclo '+state.currentCycle+' · '+done+' dias completos';
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('progFill').style.width=pct+'%';
+}
+
+// GRID
+function renderGrid(){
+  var g=document.getElementById('dayGrid');g.innerHTML='';
+  var td=todayIdx();
+  days().forEach(function(d,i){
+    var sc=dayScore(d),el=document.createElement('div');
+    el.className='day-cell'+(d.restDay?' rest-dc':isComplete(d)?' complete':sc>0?' partial':'')+(i===td?' today-cell':'');
+    el.innerHTML='<div class="day-num">D'+(i+1)+'</div>'+(d.restDay?'<div style="font-size:10px">🌿</div>':isComplete(d)?'<div class="day-star">⭐</div>':sc>0?'<div class="day-sc">'+sc+'/4</div>':'');
+    el.onclick=function(){showView('hoje',null);syncNav('hoje');};
+    g.appendChild(el);
+  });
+}
+
+// STATS
+function updateStats(){
+  var d=days(),done=d.filter(isComplete).length,pct=Math.round(done/TOTAL*100);
+  var stD=document.getElementById('stDays'),stP=document.getElementById('stPct');
+  if(stD)stD.textContent=done;if(stP)stP.textContent=pct+'%';
+  var ac=d.filter(function(x){return x.agua;}).length;
+  var le=d.filter(function(x){return x.leitura;}).length;
+  var es=d.reduce(function(s,x){return s+x.estudo;},0);
+  var tr=d.filter(function(x){return x.treino;}).length;
+  function set(k,val,max,suf){
+    var p=Math.min(100,Math.round(val/max*100));
+    var ss=document.getElementById('ss-'+k),sb=document.getElementById('sb-'+k),sp=document.getElementById('sp-'+k);
+    if(ss)ss.textContent=val+(suf?' '+suf:'');
+    if(sb)sb.style.width=p+'%';
+    if(sp)sp.textContent=p+'% da meta';
+  }
+  set('agua',ac,90,'dias');set('leitura',le,90,'dias');
+  var se=document.getElementById('ss-estudo'),sbe=document.getElementById('sb-estudo'),spe=document.getElementById('sp-estudo');
+  if(se)se.textContent=es+'h';
+  if(sbe)sbe.style.width=Math.min(100,Math.round(es/70*100))+'%';
+  if(spe)spe.textContent=es+'h de 70h';
+  set('treino',tr,70,'treinos');
+}
+
+// CICLOS
+function renderCiclos(){
+  var el=document.getElementById('ciclos-list');if(!el)return;
+  var h='';
+  var cycles=state.cycles.slice().reverse();
+  cycles.forEach(function(c){
+    var d=c.data,done=d.filter(isComplete).length,active=!c.end;
+    var start=new Date(c.start).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+    var end=c.end?new Date(c.end).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}):'Em andamento';
+    var allFin2=[],i;
+    for(i=0;i<d.length;i++){if(d[i].fin)allFin2=allFin2.concat(d[i].fin);}
+    var sr=allFin2.filter(function(f){return f.tipo==='rec';}).reduce(function(s,f){return s+f.val;},0);
+    var sd=allFin2.filter(function(f){return f.tipo==='desp';}).reduce(function(s,f){return s+f.val;},0);
+    var es=Math.round(d.reduce(function(s,x){return s+x.estudo;},0));
+    h+='<div class="cycle-card"><div class="cycle-hdr"><div class="cycle-title">Ciclo '+c.num+'</div><div class="cy-badge '+(active?'cy-active':'cy-done')+'">'+(active?'✅ Ativo':'🏆 Concluído')+'</div></div>';
+    h+='<div class="cy-dates">📅 '+start+' → '+end+'</div>';
+    h+='<div class="cy-stats"><div class="cs"><div class="cs-val">'+done+'</div><div class="cs-lbl">Completos</div></div>';
+    h+='<div class="cs"><div class="cs-val">'+d.filter(function(x){return x.agua;}).length+'</div><div class="cs-lbl">Às 5h</div></div>';
+    h+='<div class="cs"><div class="cs-val">'+es+'h</div><div class="cs-lbl">Estudo</div></div>';
+    h+='<div class="cs"><div class="cs-val">'+fmtMoney(sr-sd)+'</div><div class="cs-lbl">Saldo Fin.</div></div></div></div>';
+  });
+  el.innerHTML=h;
+}
+
+// EXPORT
+function exportExcel(){
+  var wb=XLSX.utils.book_new();
+  state.cycles.forEach(function(c){
+    var rows=[['Dia','Data','Descanso','Acordar 5h','Leitura','Ref. Leitura','Reflexão','Banho','Horas Est.','Tema Est.','Prep. Trab.','Modalidade','Duração(min)','Distância','Jantar','Esposa','Dormir','Completo','Receitas','Despesas','Saldo']];
+    var start=new Date(c.start);
+    c.data.forEach(function(d,i){
+      var dt=new Date(start);dt.setDate(dt.getDate()+i);
+      var lb={academia:'Academia',bicicleta:'Bicicleta',corrida:'Corrida',natacao:'Natação',outro:d.treinoOutro||'Outro'};
+      var fin=d.fin||[];
+      var rec=fin.filter(function(f){return f.tipo==='rec';}).reduce(function(s,f){return s+f.val;},0);
+      var desp=fin.filter(function(f){return f.tipo==='desp';}).reduce(function(s,f){return s+f.val;},0);
+      rows.push([i+1,dt.toLocaleDateString('pt-BR'),d.restDay?'Sim':'',d.agua?'S':'',
+        d.leituraTipo||'',d.leituraRef||'',d.leituraRefl||'',d.banho?'S':'',
+        d.estudo,d.estudoTema||'',d.trabalho?'S':'',lb[d.treinoTipo]||'',
+        d.treinoDur||'',d.treinoDist||'',d.jantar?'S':'',d.esposa?'S':'',d.dormir?'S':'',
+        isComplete(d)?'Sim ⭐':'Não',rec||'',desp||'',(rec-desp)||'']);
+    });
+    var ws=XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb,ws,'Ciclo '+c.num);
+  });
+  XLSX.writeFile(wb,'Ciclo90_Marlon_'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.xlsx');
+  showToast('📥 Planilha exportada!');
+}
+
+// VIEWS
+function showView(name,btn){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById('view-'+name).classList.add('active');
+  if(name==='dash')renderDashboard();
+  if(name==='hoje')syncTodayUI();
+  if(name==='fin')renderFinancas();
+  if(name==='score'){renderMedals();renderStreak();}
+  if(name==='grid'){renderGrid();updateStats();}
+  if(name==='ciclos')renderCiclos();
+  if(btn)syncNav(name);
+}
+function syncNav(name){
+  var map={dash:0,hoje:1,fin:2,score:3,grid:4,ciclos:5};
+  document.querySelectorAll('.nav-btn').forEach(function(b,i){b.classList.toggle('active',i===map[name]);});
+}
+function syncTodayUI(){
+  var d=days()[todayIdx()];
+  renderRestDay();
+  ['agua','banho','trabalho','jantar','esposa','dormir'].forEach(function(id){
+    var c=document.getElementById('chk-'+id);if(c)c.textContent=d[id]?'✓':'○';
+  });
+  document.getElementById('chk-leitura').textContent=d.leitura?'✓':'○';
+  if(d.leituraRef)document.getElementById('sub-leitura').textContent=(d.leituraTipo==='biblia'?'✝️ ':'📚 ')+d.leituraRef;
+  if(d.leituraTipo){lTipo=d.leituraTipo;setTipo(d.leituraTipo);}
+  if(d.leituraRef&&d.leituraTipo==='biblia')document.getElementById('biblia-ref').value=d.leituraRef;
+  if(d.leituraRefl)document.getElementById('leitura-refl').value=d.leituraRefl;
+  document.getElementById('hoursVal').textContent=d.estudo+'h';
+  document.getElementById('chk-estudo').textContent=d.estudo>0?'✓':'○';
+  if(d.estudoTema)document.getElementById('estudo-tema').value=d.estudoTema;
+  document.getElementById('chk-treino').textContent=d.treino?'✓':'○';
+  if(d.treinoTipo){document.getElementById('treino-tipo').value=d.treinoTipo;onTreinoChange();}
+  if(d.treinoDur)document.getElementById('t-dur').value=d.treinoDur;
+  if(d.treinoDist)document.getElementById('t-dist').value=d.treinoDist;
+  if(d.treinoOutro)document.getElementById('t-outro').value=d.treinoOutro;
+  if(d.treino&&d.treinoTipo){
+    var lb={academia:'🏋️ Academia',bicicleta:'🚴 Bicicleta',corrida:'🏃 Corrida',natacao:'🏊 Natação',outro:'⚽ '+d.treinoOutro};
+    var sub=lb[d.treinoTipo]||d.treinoTipo;
+    if(d.treinoDur)sub+=' · '+d.treinoDur+'min';
+    if(d.treinoDist)sub+=' · '+d.treinoDist+(d.treinoTipo==='natacao'?'m':'km');
+    document.getElementById('sub-treino').textContent=sub;
+  }
+  updateStatuses();
+}
+
+// TOAST
+var tt;
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},1800);
+}
+
+// INIT
+updateClock();
+setInterval(updateClock,20000);
+syncTodayUI();
+updateHeader();
+updateStreak();
+updateStats();
+updateNotifBtn();
+setTipo('biblia');
+if(state.notifEnabled&&Notification.permission==='granted')scheduleNotifs();
+scheduleNextDay();
+if(window.navigator.standalone)document.getElementById('ib').style.display='none';
+</script>
+
+</body>
+</html>
